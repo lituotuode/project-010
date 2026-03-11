@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offer崽 · 职场因果推演系统</title>
+    <style>
+        :root { --offer-red: #e74c3c; --bg-gray: #f4f4f9; }
+        body { background: var(--bg-gray); font-family: "PingFang SC", sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; overflow: hidden; }
+        
+        #scanner { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; color: #0f0; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; font-family: monospace; }
+        
+        .card { width: 360px; background: #fff; border: 6px solid #333; border-radius: 24px; position: relative; box-shadow: 20px 20px 0 rgba(0,0,0,0.1); display: none; }
+        .header { background: #333; color: #fff; padding: 15px; text-align: center; font-size: 14px; letter-spacing: 2px; }
+        
+        .main-content { padding: 30px 20px; text-align: center; }
+        .date-box { border-bottom: 2px solid #333; margin-bottom: 20px; padding-bottom: 10px; }
+        .day { font-size: 100px; font-weight: 900; line-height: 1; margin: 10px 0; color: var(--offer-red); }
+        
+        .yiji-table { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .slot { border: 2px solid #333; border-radius: 12px; padding: 15px; position: relative; min-height: 80px; display: flex; flex-direction: column; justify-content: center;}
+        .slot::before { content: attr(data-label); position: absolute; top: -12px; left: 10px; background: #fff; padding: 0 5px; font-weight: bold; font-size: 12px; }
+        .slot.yi { border-color: var(--offer-red); color: var(--offer-red); }
+        
+        .offer-speech { margin-top: 25px; padding: 15px; background: #fff9f9; border-radius: 12px; font-size: 13px; color: #666; position: relative; border: 1px solid #eee; }
+    </style>
+</head>
+<body>
+
+    <div id="scanner">
+        <div id="scanText">> 初始化 Offer崽 推演模块...</div>
+        <div style="width: 200px; height: 2px; background: #222; margin-top: 10px;">
+            <div id="bar" style="width: 0%; height: 100%; background: #0f0;"></div>
+        </div>
+    </div>
+
+    <div class="card" id="mainCard">
+        <div class="header">OFFERZAI LOGIC v0.9 - 职场生存版</div>
+        <div class="main-content">
+            <div class="date-box">
+                <div id="ym">2026 / 03</div>
+                <div class="day" id="d">10</div>
+                <div id="wk">TUESDAY</div>
+            </div>
+
+            <div class="yiji-table">
+                <div class="slot yi" data-label="宜">
+                    <div id="yiText">正在推演...</div>
+                </div>
+                <div class="slot" data-label="忌">
+                    <div id="jiText">正在搜索...</div>
+                </div>
+            </div>
+
+            <div class="offer-speech">
+                <strong>Offer崽曰：</strong>
+                <span id="speechText">正在读取职场波动...</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 深度扩充词库
+        const yiList = [
+            "带薪蹲坑", "拒绝无效会议", "整理工位", "准点下班", "向上管理", 
+            "领取快递", "夸奖老板发型", "重构冗余代码", "潜水摸鱼", "更新简历",
+            "在群里发表情包", "申请远程办公", "调戏AI助手", "吃顿好的"
+        ];
+        const jiList = [
+            "相信老板画饼", "帮人修座机", "周五下午上线", "主动加班", 
+            "提交辞职报告", "忘记保存文档", "帮隔壁组修Bug", "在群里发错语音",
+            "接手烂摊子需求", "跨部门撕逼", "深夜发朋友圈工作", "空腹开会"
+        ];
+        const tips = [
+            "摸摸头，Offer不发愁", 
+            "代码千条，保命第一。", 
+            "今天老板脸色 0x00FF00，宜靠近。", 
+            "检测到薪资波动，建议保持沉默。",
+            "所有的Bug都是成长的养料，但今天不宜施肥。"
+        ];
+
+        let progress = 0;
+        const bar = document.getElementById('bar');
+        const scanText = document.getElementById('scanText');
+        
+        const loader = setInterval(() => {
+            progress += Math.random() * 20;
+            bar.style.width = Math.min(progress, 100) + "%";
+            if (progress >= 40) scanText.innerText = "> 正在加载职场黑话库...";
+            if (progress >= 80) scanText.innerText = "> 正在接入 Offer崽 情感接口...";
+            if (progress >= 100) {
+                clearInterval(loader);
+                document.getElementById('scanner').style.display = 'none';
+                document.getElementById('mainCard').style.display = 'block';
+                runLogic();
+            }
+        }, 120);
+
+        function runLogic() {
+            const now = new Date();
+            const seed = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
+            const rand = (s) => (Math.sin(s) * 10000 - Math.floor(Math.sin(s) * 10000));
+
+            document.getElementById('d').innerText = now.getDate();
+            document.getElementById('ym').innerText = `${now.getFullYear()} / ${String(now.getMonth()+1).padStart(2,'0')}`;
+
+            const type = (id, text) => {
+                let i = 0;
+                document.getElementById(id).innerText = "";
+                const t = setInterval(() => {
+                    document.getElementById(id).innerText += text[i];
+                    i++;
+                    if(i >= text.length) clearInterval(t);
+                }, 80);
+            };
+
+            // 每天生成两个“宜”和两个“忌”
+            const dailyYi = yiList[Math.floor(rand(seed) * yiList.length)] + "\n" + yiList[Math.floor(rand(seed + 5) * yiList.length)];
+            const dailyJi = jiList[Math.floor(rand(seed + 1) * jiList.length)] + "\n" + jiList[Math.floor(rand(seed + 6) * jiList.length)];
+
+            type('yiText', dailyYi);
+            setTimeout(() => type('jiText', dailyJi), 600);
+            setTimeout(() => type('speechText', tips[Math.floor(rand(seed+2) * tips.length)]), 1200);
+        }
+    </script>
+</body>
+</html>
